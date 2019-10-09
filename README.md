@@ -148,20 +148,20 @@ _**All of your endpoints should send the below responses in an object, with a ke
 
 ```json
 {
-  "topics": [
-    {
-      "description": "Code is love, code is life",
-      "slug": "coding"
-    },
-    {
-      "description": "FOOTIE!",
-      "slug": "football"
-    },
-    {
-      "description": "Hey good looking, what you got cooking?",
-      "slug": "cooking"
-    }
-  ]
+	"topics": [
+		{
+			"description": "Code is love, code is life",
+			"slug": "coding"
+		},
+		{
+			"description": "FOOTIE!",
+			"slug": "football"
+		},
+		{
+			"description": "Hey good looking, what you got cooking?",
+			"slug": "cooking"
+		}
+	]
 }
 ```
 

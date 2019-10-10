@@ -86,4 +86,4 @@ exports.selectAllArticles = ({ sort_by, order, author, topic }) => {
 		});
 };
 
-exports.checkExists = query => {};
+// exports.checkExists = query => {};

@@ -20,15 +20,15 @@ describe('/api', () => {
 					);
 				});
 		});
+		// it('returns a 404 status code and an error message when an invalid route is given', () => {
+		// 	return request(app)
+		// 		.get('/corgi')
+		// 		.expect(404)
+		// 		.then(({ body }) => {
+		// 			expect(body.msg).to.equal('Route not found');
+		// 		});
+		// });
 	});
-	// it('returns a 404 status code and an error message when an invalid route is given', () => {
-	// 	return request(app)
-	// 		.get('/corgi')
-	// 		.expect(404)
-	// 		.then(({ body }) => {
-	// 			expect(body.msg).to.equal('Route not found');
-	// 		});
-	// });
 	describe('/topics', () => {
 		it('GET / 200: returns an array of topic objects', () => {
 			return request(app)

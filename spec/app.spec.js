@@ -16,7 +16,7 @@ describe('/api', () => {
 				.expect(418)
 				.then(({ body }) => {
 					expect(body.msg).to.equal(
-						'Coffee absoliutely cannot under any circumstances be brewed here! I am a teapot!'
+						'Coffee absolutely cannot under any circumstances be brewed here! I am a teapot!'
 					);
 				});
 		});

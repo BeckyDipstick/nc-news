@@ -9,6 +9,26 @@ const { connection } = require('../db/connection');
 describe('/api', () => {
 	beforeEach(() => connection.seed.run());
 	after(() => connection.destroy());
+	describe('/*', () => {
+		it('returns 418 status code and an error message when an invalid route is used', () => {
+			return request(app)
+				.get('/invalid')
+				.expect(418)
+				.then(({ body }) => {
+					expect(body.msg).to.equal(
+						'Coffee absoliutely cannot under any circumstances be brewed here! I am a teapot!'
+					);
+				});
+		});
+	});
+	// it('returns a 404 status code and an error message when an invalid route is given', () => {
+	// 	return request(app)
+	// 		.get('/corgi')
+	// 		.expect(404)
+	// 		.then(({ body }) => {
+	// 			expect(body.msg).to.equal('Route not found');
+	// 		});
+	// });
 	describe('/topics', () => {
 		it('GET / 200: returns an array of topic objects', () => {
 			return request(app)
@@ -47,7 +67,7 @@ describe('/api', () => {
 		it('PATCH/:username returns a status code 405 and an errir message when a patch request is sent to a username', () => {
 			return request(app)
 				.patch('/api/users/icellusedkars')
-				.send({ username: 'lurker2019' })
+				.send({ username: 'icellusedkars2019' })
 				.expect(405)
 				.then(({ body: { msg } }) => {
 					expect(msg).to.equal('method not allowed');
@@ -120,6 +140,15 @@ describe('/api', () => {
 					);
 				});
 		});
+		// it('returns a status code 200 and an empty array when given an author which is valid but has no articles', () => {
+		// 	return request(app)
+		// 		.get('api/articles?author=lurker')
+		// 		.expect(200)
+		// 		.then(({ body: { articles } }) => {
+		// 			expect(articles.length).to.equal(0);
+		// 			expect(articles).to.be.an('array');
+		// 		});
+		// });
 		it('returns a 404 status code and an error message when given an author query which does not exist', () => {
 			return request(app)
 				.get('/api/articles/?author=corgi_brigade')
@@ -128,14 +157,22 @@ describe('/api', () => {
 					expect(body.msg).to.equal('author corgi_brigade not found');
 				});
 		});
-		// it('accpets a query to return all the articles by a topic', () => {
-		// 	return request(app)
-		// 		.get('/api/articles?topic=mitch')
-		// 		.expect(200)
-		// 		.then(({ body: articles }) => {
-		// 			expect(articles[0].topic).to.equal('mitch');
-		// 		});
-		// });
+		it('accpets a query to return all the articles by a topic', () => {
+			return request(app)
+				.get('/api/articles?topic=mitch')
+				.expect(200)
+				.then(({ body: { articles } }) => {
+					expect(articles[0].topic).to.equal('mitch');
+				});
+		});
+		it('returns a 404 status code and an error message when given a topic query which does not exist', () => {
+			return request(app)
+				.get('/api/articles/?topic=corgi_brigade')
+				.expect(404)
+				.then(({ body }) => {
+					expect(body.msg).to.equal('topic corgi_brigade not found');
+				});
+		});
 		it('GET/articles/101: returns a 404 status code and an error message when given an article ID which does not exist', () => {
 			return request(app)
 				.get('/api/articles/101')
@@ -216,7 +253,7 @@ describe('/api', () => {
 					);
 				});
 		});
-		it('GET/articles/:article_id/comments: 200 - returns an array of comments for the given article', () => {
+		it('GET/articles/:article_id/comments: 200 - returns an array of comments for the given article,', () => {
 			return request(app)
 				.get('/api/articles/1/comments')
 				.expect(200)
@@ -228,6 +265,22 @@ describe('/api', () => {
 						'author',
 						'body'
 					);
+				});
+		});
+		it('sorts the comments by created_at in descending order as default', () => {
+			return request(app)
+				.get('/api/articles/1/comments')
+				.expect(200)
+				.then(({ body: { comments } }) => {
+					expect(comments).to.be.sortedBy('created_at', { descending: true });
+				});
+		});
+		it('allows comments to be sorted by a specified column, in a specified order', () => {
+			return request(app)
+				.get('/api/articles/1/comments?sort_by=votes&order=asc')
+				.expect(200)
+				.then(({ body: { comments } }) => {
+					expect(comments).to.be.sortedBy('votes', { ascending: true });
 				});
 		});
 		it('DELETE/articles/:article_id returns a status code 405 and an invalid method error message', () => {
@@ -296,6 +349,22 @@ describe('/api', () => {
 				return request(app)
 					.delete('/api/comments/1')
 					.expect(204);
+			});
+			it('DELETE/comments/1020 returns with a 404 status code and an error message when given an id which does not exist', () => {
+				return request(app)
+					.delete('/api/comments/1020')
+					.expect(404)
+					.then(({ body }) => {
+						expect(body.msg).to.equal('comment 1020 does not exist');
+					});
+			});
+			it('DELETE/comments/invalid_input_type returns a 400 status code and an error mesaage when given an id of the wrong type', () => {
+				return request(app)
+					.delete('/api/comments/invalid_type')
+					.expect(400)
+					.then(({ body }) => {
+						expect(body.msg).to.equal('bad request - invalid input');
+					});
 			});
 		});
 	});

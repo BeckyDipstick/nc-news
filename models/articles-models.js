@@ -48,29 +48,42 @@ exports.insertComment = ({ article_id }, comment) => {
 		.then(comment => comment[0]);
 };
 
-exports.selectCommentsForArticle = ({ article_id }) => {
+exports.selectCommentsForArticle = (article_id, { sort_by, order }) => {
 	return connection('comments')
 		.select('*')
 		.from('comments')
-		.where('article_id', article_id);
+		.where('article_id', article_id)
+		.orderBy(sort_by || 'created_at', order || 'desc');
 };
 
-exports.selectAllArticles = ({ sort_by, order, author }) => {
+exports.selectAllArticles = ({ sort_by, order, author, topic }) => {
+	// seperate query to determine if author/topic exists
+	// do this in comments by article as well
+	// make a function checkExists model which checks if something is in the database or not
+	// can either be done before or in then block
 	return connection('articles')
 		.select('*')
 		.from('articles')
 		.orderBy(sort_by || 'created_at', order || 'desc')
 		.modify(query => {
 			if (author) query.where('articles.author', author);
-			// if (topic) query.where('articles.topic', topic);
+			if (topic) query.where('articles.topic', topic);
 		})
-		.then(article => {
-			if (author && !article.length) {
+		.then(articles => {
+			if (author && !articles.length) {
 				return Promise.reject({
 					status: 404,
 					msg: `author ${author} not found`
 				});
 			}
-			return article;
+			if (topic && !articles.length) {
+				return Promise.reject({
+					status: 404,
+					msg: `topic ${topic} not found`
+				});
+			}
+			return articles;
 		});
 };
+
+exports.checkExists = query => {};

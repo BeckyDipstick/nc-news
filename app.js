@@ -14,5 +14,14 @@ app.use('/api', apiRouter);
 app.use(handleCustomErrors);
 app.use(handlePSQLErrors);
 app.use(handleServerErrors);
+app.all('/*', (req, res, next) =>
+	res.status(418).send({
+		msg:
+			'Coffee absoliutely cannot under any circumstances be brewed here! I am a teapot!'
+	})
+);
+// app.all('/*', (req, res, next) =>
+// 	res.status(404).send({ msg: 'Route not found' })
+// );
 
 module.exports = app;

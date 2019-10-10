@@ -9,6 +9,16 @@ const { connection } = require('../db/connection');
 describe('/api', () => {
 	beforeEach(() => connection.seed.run());
 	after(() => connection.destroy());
+	describe('DELETE/api', () => {
+		it('sends a status code 405 and an error message when in invalid method is used', () => {
+			return request(app)
+				.delete('/api')
+				.expect(405)
+				.then(({ body }) => {
+					expect(body.msg).to.equal('method not allowed');
+				});
+		});
+	});
 	describe('/*', () => {
 		it('returns 418 status code and an error message when an invalid route is used', () => {
 			return request(app)
@@ -53,7 +63,7 @@ describe('/api', () => {
 				.get('/api/users/lurker')
 				.expect(200)
 				.then(({ body: { user } }) => {
-					expect(user[0]).to.have.keys('username', 'avatar_url', 'name');
+					expect(user.user[0]).to.have.keys('username', 'avatar_url', 'name');
 				});
 		});
 		it('GET /:invalid_username, returns a 404: user not found error when passed an invalid username', () => {
@@ -97,6 +107,7 @@ describe('/api', () => {
 				.expect(200)
 				.then(({ body: { article } }) => {
 					expect(article[0]).to.contain.keys('comment_count');
+					expect(article[0].comment_count).to.equal('13');
 				});
 		});
 		it('returns the array sorted by date as a default', () => {
@@ -123,6 +134,7 @@ describe('/api', () => {
 					expect(articles).to.be.sortedBy('article_id', { ascending: true });
 				});
 		});
+
 		it('accepts a query to return all the articles by username', () => {
 			return request(app)
 				.get('/api/articles?author=butter_bridge')
@@ -253,6 +265,17 @@ describe('/api', () => {
 					);
 				});
 		});
+		it('POST/articles/:article_id/comments - returns a status code 400 and an error message when the request does not contain the required keys', () => {
+			return request(app)
+				.post('/api/articles/1/comments')
+				.send({ username: 'lurker' })
+				.expect(400)
+				.then(({ body }) => {
+					expect(body.msg).to.equal(
+						'Cannot post. One or more field incomplete'
+					);
+				});
+		});
 		it('GET/articles/:article_id/comments: 200 - returns an array of comments for the given article,', () => {
 			return request(app)
 				.get('/api/articles/1/comments')
@@ -283,6 +306,14 @@ describe('/api', () => {
 					expect(comments).to.be.sortedBy('votes', { ascending: true });
 				});
 		});
+		it('returns a status code 404 and an error message when passed an id which does not exist', () => {
+			return request(app)
+				.get('/api/articles/1000/comments')
+				.expect(404)
+				.then(({ body }) => {
+					expect(body.msg).to.equal('article 1000 does not exist');
+				});
+		});
 		it('DELETE/articles/:article_id returns a status code 405 and an invalid method error message', () => {
 			return request(app)
 				.delete('/api/articles/1')
@@ -309,6 +340,14 @@ describe('/api', () => {
 							'body',
 							'article_id'
 						);
+					});
+			});
+			it('when sent a body with no inc_votes returns status code 200 and the unchanged comment', () => {
+				return request(app)
+					.patch('/api/comments/1')
+					.expect(200)
+					.then(({ body: { comment } }) => {
+						expect(comment.votes).to.equal(16);
 					});
 			});
 			it('returns a comment object with the number of votes decremented', () => {

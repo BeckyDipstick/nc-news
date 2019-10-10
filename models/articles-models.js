@@ -41,11 +41,26 @@ exports.insertComment = ({ article_id }, comment) => {
 		body: comment.body,
 		article_id
 	};
-	return connection('comments')
-		.insert(commentToPost)
-		.into('comments')
-		.returning('*')
-		.then(comment => comment[0]);
+	if (!commentToPost.author || !commentToPost.body) {
+		return Promise.reject({
+			status: 400,
+			msg: 'Cannot post. One or more field incomplete'
+		});
+	} else {
+		return connection('comments')
+			.insert(commentToPost)
+			.into('comments')
+			.returning('*')
+			.then(comments => {
+				if (!comments.length) {
+					return Promise.reject({
+						status: 422,
+						msg: `unable to process request, article ${article_id} does not exist`
+					});
+				}
+				return comments[0];
+			});
+	}
 };
 
 exports.selectCommentsForArticle = (article_id, { sort_by, order }) => {
@@ -53,7 +68,16 @@ exports.selectCommentsForArticle = (article_id, { sort_by, order }) => {
 		.select('*')
 		.from('comments')
 		.where('article_id', article_id)
-		.orderBy(sort_by || 'created_at', order || 'desc');
+		.orderBy(sort_by || 'created_at', order || 'desc')
+		.then(comments => {
+			if (!comments.length) {
+				return Promise.reject({
+					status: 404,
+					msg: `article ${article_id} does not exist`
+				});
+			}
+			return comments;
+		});
 };
 
 exports.selectAllArticles = ({ sort_by, order, author, topic }) => {

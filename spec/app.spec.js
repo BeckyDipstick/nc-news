@@ -9,6 +9,15 @@ const { connection } = require('../db/connection');
 describe('/api', () => {
 	beforeEach(() => connection.seed.run());
 	after(() => connection.destroy());
+	// describe('GET/api', () => {
+	// 	it('returns a JSON object detailing all available end points and queries permitted on each route', () => {
+	// 		return request(app)
+	// 			.get('/api')
+	// 			.expect(200)
+	// 			.expect({ body })
+	// 			.to.be.an('object');
+	// 	});
+	// });
 	describe('DELETE/api', () => {
 		it('sends a status code 405 and an error message when in invalid method is used', () => {
 			return request(app)
@@ -63,7 +72,8 @@ describe('/api', () => {
 				.get('/api/users/lurker')
 				.expect(200)
 				.then(({ body: { user } }) => {
-					expect(user.user[0]).to.have.keys('username', 'avatar_url', 'name');
+					console.log(user);
+					expect(user.user).to.have.keys('username', 'avatar_url', 'name');
 				});
 		});
 		it('GET /:invalid_username, returns a 404: user not found error when passed an invalid username', () => {
@@ -89,8 +99,8 @@ describe('/api', () => {
 			return request(app)
 				.get('/api/articles/1')
 				.expect(200)
-				.then(({ body: { article } }) => {
-					expect(article[0]).to.contain.keys(
+				.then(({ body }) => {
+					expect(body.article).to.contain.keys(
 						'author',
 						'title',
 						'article_id',
@@ -105,9 +115,9 @@ describe('/api', () => {
 			return request(app)
 				.get('/api/articles/1')
 				.expect(200)
-				.then(({ body: { article } }) => {
-					expect(article[0]).to.contain.keys('comment_count');
-					expect(article[0].comment_count).to.equal('13');
+				.then(({ body }) => {
+					expect(body.article).to.contain.keys('comment_count');
+					expect(body.article.comment_count).to.equal('13');
 				});
 		});
 		it('returns the array sorted by date as a default', () => {
@@ -116,6 +126,14 @@ describe('/api', () => {
 				.expect(200)
 				.then(({ body: { articles } }) => {
 					expect(articles).to.be.sortedBy('created_at', { descending: true });
+				});
+		});
+		it('GET/api/articles returns all the articles with a comment count key', () => {
+			return request(app)
+				.get('/api/articles')
+				.expect(200)
+				.then(({ body: { articles } }) => {
+					expect(articles[0]).to.contain.keys('comment_count');
 				});
 		});
 		it('should accept a query to sort a specific column', () => {

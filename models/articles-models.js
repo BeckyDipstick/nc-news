@@ -15,7 +15,7 @@ exports.selectArticleById = ({ article_id }) => {
 					msg: `article ${article_id} not found`
 				});
 			}
-			return article;
+			return article[0];
 		});
 };
 
@@ -81,14 +81,14 @@ exports.selectCommentsForArticle = (article_id, { sort_by, order }) => {
 };
 
 exports.selectAllArticles = ({ sort_by, order, author, topic }) => {
-	// seperate query to determine if author/topic exists
-	// do this in comments by article as well
-	// make a function checkExists model which checks if something is in the database or not
-	// can either be done before or in then block
+	// console.log(order);
 	return connection('articles')
-		.select('*')
+		.select('articles.*')
 		.from('articles')
-		.orderBy(sort_by || 'created_at', order || 'desc')
+		.orderBy(sort_by || 'articles.created_at', order || 'desc')
+		.leftJoin('comments', 'articles.article_id', 'comments.article_id')
+		.groupBy('articles.article_id')
+		.count('comments.article_id as comment_count')
 		.modify(query => {
 			if (author) query.where('articles.author', author);
 			if (topic) query.where('articles.topic', topic);
@@ -111,3 +111,8 @@ exports.selectAllArticles = ({ sort_by, order, author, topic }) => {
 };
 
 // exports.checkExists = query => {};
+// 200/404 error
+// seperate query to determine if author/topic exists
+// do this in comments by article as well
+// make a function checkExists model which checks if something is in the database or not
+// can either be done before or in then block

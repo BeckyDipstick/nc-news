@@ -153,7 +153,7 @@ describe('/api', () => {
 		});
 		it('when given an invalid column to sort, returns a status code 200 and the articles sorted by their default column', () => {
 			return request(app)
-				.get('/api/articles?sort_by=corgi')
+				.get('/api/articles?sort_by=corgi&order=asc')
 				.expect(200)
 				.then(({ body: { articles } }) => {
 					expect(articles).to.be.sortedBy('created_at', { descending: true });
@@ -337,6 +337,14 @@ describe('/api', () => {
 				.expect(200)
 				.then(({ body: { comments } }) => {
 					expect(comments).to.be.sortedBy('votes', { ascending: true });
+				});
+		});
+		it('when an invalid sort column is provided it returns status code 200 and the comments sorted by the defaul column and order', () => {
+			return request(app)
+				.get('/api/articles/1/comments?sort_by=corgi&order=asc')
+				.expect(200)
+				.then(({ body: { comments } }) => {
+					expect(comments).to.be.sortedBy('created_at', { descending: true });
 				});
 		});
 		it('returns a status code 404 and an error message when passed an id which does not exist', () => {

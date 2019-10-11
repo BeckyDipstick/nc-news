@@ -64,6 +64,15 @@ exports.insertComment = ({ article_id }, comment) => {
 };
 
 exports.selectCommentsForArticle = (article_id, { sort_by, order }) => {
+	const validSortColumns = [
+		'comment_id',
+		'author',
+		'votes',
+		'created_at',
+		'article_id'
+	];
+	if (!validSortColumns.includes(sort_by))
+		(sort_by = 'created_at'), (order = 'desc');
 	return connection('comments')
 		.select('*')
 		.from('comments')
@@ -88,7 +97,8 @@ exports.selectAllArticles = ({ sort_by, order, author, topic }) => {
 		'author',
 		'article_id'
 	];
-	if (!validSortColumns.includes(sort_by)) sort_by = 'created_at';
+	if (!validSortColumns.includes(sort_by))
+		(sort_by = 'created_at'), (order = 'desc');
 	return connection('articles')
 		.select('articles.*')
 		.from('articles')

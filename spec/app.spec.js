@@ -72,7 +72,8 @@ describe('/api', () => {
 				.get('/api/users/lurker')
 				.expect(200)
 				.then(({ body: { user } }) => {
-					expect(user.user[0]).to.have.keys('username', 'avatar_url', 'name');
+					console.log(user);
+					expect(user.user).to.have.keys('username', 'avatar_url', 'name');
 				});
 		});
 		it('GET /:invalid_username, returns a 404: user not found error when passed an invalid username', () => {

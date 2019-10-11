@@ -12,6 +12,7 @@ exports.selectUserByUsername = ({ username }) => {
 					msg: `username ${username} does not exist`
 				});
 			}
-			return user;
+			console.log(user);
+			return user[0];
 		});
 };

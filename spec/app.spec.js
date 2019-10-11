@@ -72,7 +72,6 @@ describe('/api', () => {
 				.get('/api/users/lurker')
 				.expect(200)
 				.then(({ body: { user } }) => {
-					console.log(user);
 					expect(user.user).to.have.keys('username', 'avatar_url', 'name');
 				});
 		});
@@ -120,6 +119,14 @@ describe('/api', () => {
 					expect(body.article.comment_count).to.equal('13');
 				});
 		});
+		it('GET/api/articles/2 responds with a status code 200 and the article object the votes key should have a value of 0', () => {
+			return request(app)
+				.get('/api/articles/2')
+				.expect(200)
+				.then(({ body }) => {
+					expect(body.article.votes).to.equal(0);
+				});
+		});
 		it('returns the array sorted by date as a default', () => {
 			return request(app)
 				.get('/api/articles')
@@ -142,6 +149,14 @@ describe('/api', () => {
 				.expect(200)
 				.then(({ body: { articles } }) => {
 					expect(articles).to.be.sortedBy('article_id', { descending: true });
+				});
+		});
+		it('when given an invalid column to sort, returns a status code 200 and the articles sorted by their default column', () => {
+			return request(app)
+				.get('/api/articles?sort_by=corgi')
+				.expect(200)
+				.then(({ body: { articles } }) => {
+					expect(articles).to.be.sortedBy('created_at', { descending: true });
 				});
 		});
 		it('should accepts a query to sort a specific column in ascending order', () => {

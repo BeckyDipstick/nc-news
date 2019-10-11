@@ -81,7 +81,14 @@ exports.selectCommentsForArticle = (article_id, { sort_by, order }) => {
 };
 
 exports.selectAllArticles = ({ sort_by, order, author, topic }) => {
-	// console.log(order);
+	const validSortColumns = [
+		'created_at',
+		'title',
+		'votes',
+		'author',
+		'article_id'
+	];
+	if (!validSortColumns.includes(sort_by)) sort_by = 'created_at';
 	return connection('articles')
 		.select('articles.*')
 		.from('articles')

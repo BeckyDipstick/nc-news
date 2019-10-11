@@ -69,10 +69,10 @@ describe('/api', () => {
 	describe('/users/', () => {
 		it('GET /:username 200, returns an array containing a user object matching the username', () => {
 			return request(app)
-				.get('/api/users/lurker')
+				.get('/api/users/butter_bridge')
 				.expect(200)
 				.then(({ body: { user } }) => {
-					expect(user.user).to.have.keys('username', 'avatar_url', 'name');
+					expect(user).to.have.keys('username', 'avatar_url', 'name');
 				});
 		});
 		it('GET /:invalid_username, returns a 404: user not found error when passed an invalid username', () => {
@@ -133,6 +133,14 @@ describe('/api', () => {
 				.expect(200)
 				.then(({ body: { articles } }) => {
 					expect(articles).to.be.sortedBy('created_at', { descending: true });
+				});
+		});
+		it('accepts a query for the articles to be sorted in a specific order', () => {
+			return request(app)
+				.get('/api/articles?order=asc')
+				.expect(200)
+				.then(({ body: { articles } }) => {
+					expect(articles).to.be.sortedBy('created_at', { ascending: true });
 				});
 		});
 		it('GET/api/articles returns all the articles with a comment count key', () => {

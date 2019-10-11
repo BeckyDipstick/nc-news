@@ -6,6 +6,10 @@ exports.handleCustomErrors = (err, req, res, next) => {
 
 exports.handlePSQLErrors = (err, req, res, next) => {
 	const PSQLErrorCodes = ['22P02'];
+	const test = ['23503'];
+	if (test.includes(err.code)) {
+		res.status(422).send({ msg: 'unable to process request' });
+	}
 	if (PSQLErrorCodes.includes(err.code)) {
 		res.status(400).send({ msg: 'bad request - invalid input' });
 	} else next(err);

@@ -309,6 +309,15 @@ describe('/api', () => {
 					);
 				});
 		});
+		it('POST/articles/1000/comments returns a status code 404 and an error message when passed an id in the correct format which does not exist', () => {
+			return request(app)
+				.post('/api/articles/1000/comments')
+				.send({ username: 'lurker', body: 'corgi' })
+				.expect(422)
+				.then(({ body }) => {
+					expect(body.msg).to.equal('unable to process request');
+				});
+		});
 		it('GET/articles/:article_id/comments: 200 - returns an array of comments for the given article,', () => {
 			return request(app)
 				.get('/api/articles/1/comments')

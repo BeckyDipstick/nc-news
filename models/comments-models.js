@@ -1,4 +1,4 @@
-const { connection } = require('../db/connection');
+const connection = require('../db/connection');
 
 exports.updateCommentById = ({ comment_id }, { inc_votes = 0 }) => {
 	return connection('comments')

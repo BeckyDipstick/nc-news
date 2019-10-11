@@ -4,7 +4,7 @@ const request = require('supertest');
 const chai = require('chai');
 const expect = chai.expect;
 chai.use(require('chai-sorted'));
-const { connection } = require('../db/connection');
+const connection = require('../db/connection');
 
 describe('/api', () => {
 	beforeEach(() => connection.seed.run());

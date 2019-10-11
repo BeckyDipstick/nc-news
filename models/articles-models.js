@@ -51,14 +51,8 @@ exports.insertComment = ({ article_id }, comment) => {
 			.insert(commentToPost)
 			.into('comments')
 			.returning('*')
-			.then(comments => {
-				if (!comments.length) {
-					return Promise.reject({
-						status: 422,
-						msg: `unable to process request, article ${article_id} does not exist`
-					});
-				}
-				return comments[0];
+			.then(comment => {
+				return comment[0];
 			});
 	}
 };

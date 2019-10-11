@@ -309,7 +309,7 @@ describe('/api', () => {
 					);
 				});
 		});
-		it('POST/articles/1000/comments returns a status code 404 and an error message when passed an id in the correct format which does not exist', () => {
+		it('POST/articles/1000/comments returns a status code 422 and an error message when passed an id in the correct format which does not exist', () => {
 			return request(app)
 				.post('/api/articles/1000/comments')
 				.send({ username: 'lurker', body: 'corgi' })

@@ -148,9 +148,3 @@ exports.selectAllArticles = ({
 				});
 		});
 };
-
-// 200/404 error
-// seperate query to determine if author/topic exists
-// do this in comments by article as well
-// make a function checkExists model which checks if something is in the database or not
-// can either be done before or in then block

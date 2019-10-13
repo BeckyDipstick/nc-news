@@ -65,25 +65,37 @@ exports.selectCommentsForArticle = (article_id, { sort_by, order }) => {
 		'created_at',
 		'article_id'
 	];
-	if (!validSortColumns.includes(sort_by))
-		(sort_by = 'created_at'), (order = 'desc');
+	if (!validSortColumns.includes(sort_by)) sort_by = 'created_at';
 	return connection('comments')
 		.select('*')
 		.from('comments')
 		.where('article_id', article_id)
 		.orderBy(sort_by || 'created_at', order || 'desc')
 		.then(comments => {
-			if (!comments.length) {
-				return Promise.reject({
-					status: 404,
-					msg: `article ${article_id} does not exist`
+			return connection('articles')
+				.select('*')
+				.from('articles')
+				.where('article_id', article_id)
+				.returning('*')
+				.then(res => {
+					if (res.length) return comments;
+					if (!comments.length) {
+						return Promise.reject({
+							status: 404,
+							msg: `article ${article_id} does not exist`
+						});
+					}
+					return comments;
 				});
-			}
-			return comments;
 		});
 };
 
-exports.selectAllArticles = ({ sort_by, order, author, topic }) => {
+exports.selectAllArticles = ({
+	sort_by,
+	order = 'desc',
+	author = '',
+	topic = ''
+}) => {
 	const validSortColumns = [
 		'created_at',
 		'title',
@@ -91,8 +103,8 @@ exports.selectAllArticles = ({ sort_by, order, author, topic }) => {
 		'author',
 		'article_id'
 	];
-	if (!validSortColumns.includes(sort_by))
-		(sort_by = 'created_at'), (order = 'desc');
+	if (!validSortColumns.includes(sort_by)) sort_by = 'created_at';
+
 	return connection('articles')
 		.select('articles.*')
 		.from('articles')
@@ -105,23 +117,38 @@ exports.selectAllArticles = ({ sort_by, order, author, topic }) => {
 			if (topic) query.where('articles.topic', topic);
 		})
 		.then(articles => {
-			if (author && !articles.length) {
-				return Promise.reject({
-					status: 404,
-					msg: `author ${author} not found`
+			return connection('topics')
+				.select('*')
+				.from('topics')
+				.where('topics.slug', topic)
+				.returning('*')
+				.then(topics => {
+					if (topics.length) return articles;
+					return connection('users')
+						.select('*')
+						.from('users')
+						.where('users.username', author)
+						.returning('*')
+						.then(authors => {
+							if (authors.length) return articles;
+							if (author && !articles.length) {
+								return Promise.reject({
+									status: 404,
+									msg: `author ${author} not found`
+								});
+							}
+							if (topic && !articles.length) {
+								return Promise.reject({
+									status: 404,
+									msg: `topic ${topic} not found`
+								});
+							}
+							return articles;
+						});
 				});
-			}
-			if (topic && !articles.length) {
-				return Promise.reject({
-					status: 404,
-					msg: `topic ${topic} not found`
-				});
-			}
-			return articles;
 		});
 };
 
-// exports.checkExists = query => {};
 // 200/404 error
 // seperate query to determine if author/topic exists
 // do this in comments by article as well

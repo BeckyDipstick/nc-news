@@ -161,7 +161,7 @@ describe('/api', () => {
 		});
 		it('when given an invalid column to sort, returns a status code 200 and the articles sorted by their default column', () => {
 			return request(app)
-				.get('/api/articles?sort_by=corgi&order=asc')
+				.get('/api/articles?sort_by=corgi&order=desc')
 				.expect(200)
 				.then(({ body: { articles } }) => {
 					expect(articles).to.be.sortedBy('created_at', { descending: true });
@@ -193,15 +193,24 @@ describe('/api', () => {
 					);
 				});
 		});
-		// it('returns a status code 200 and an empty array when given an author which is valid but has no articles', () => {
-		// 	return request(app)
-		// 		.get('api/articles?author=lurker')
-		// 		.expect(200)
-		// 		.then(({ body: { articles } }) => {
-		// 			expect(articles.length).to.equal(0);
-		// 			expect(articles).to.be.an('array');
-		// 		});
-		// });
+		it('returns a status code 200 and an empty array when given an author which is valid but has no articles', () => {
+			return request(app)
+				.get('/api/articles?author=lurker')
+				.expect(200)
+				.then(({ body: { articles } }) => {
+					expect(articles.length).to.equal(0);
+					expect(articles).to.be.an('array');
+				});
+		});
+		it('returns a status code 200 and an empty array when given a topic which is valid but has no articles', () => {
+			return request(app)
+				.get('/api/articles?topic=paper')
+				.expect(200)
+				.then(({ body: { articles } }) => {
+					expect(articles.length).to.equal(0);
+					expect(articles).to.be.an('array');
+				});
+		});
 		it('returns a 404 status code and an error message when given an author query which does not exist', () => {
 			return request(app)
 				.get('/api/articles/?author=corgi_brigade')
@@ -340,12 +349,29 @@ describe('/api', () => {
 					);
 				});
 		});
+		it('returns a status code 200 and an empty array when passed an article id which is valid but has no comments associated with it', () => {
+			return request(app)
+				.get('/api/articles/2/comments')
+				.expect(200)
+				.then(({ body: { comments } }) => {
+					expect(comments.length).to.equal(0);
+					expect(comments).to.be.an('array');
+				});
+		});
 		it('sorts the comments by created_at in descending order as default', () => {
 			return request(app)
 				.get('/api/articles/1/comments')
 				.expect(200)
 				.then(({ body: { comments } }) => {
 					expect(comments).to.be.sortedBy('created_at', { descending: true });
+				});
+		});
+		it('accepts a query to sort the comments in a specified order', () => {
+			return request(app)
+				.get('/api/articles/1/comments?order=asc')
+				.expect(200)
+				.then(({ body: { comments } }) => {
+					expect(comments).to.be.sortedBy('created_at', { ascending: true });
 				});
 		});
 		it('allows comments to be sorted by a specified column, in a specified order', () => {
@@ -361,7 +387,7 @@ describe('/api', () => {
 				.get('/api/articles/1/comments?sort_by=corgi&order=asc')
 				.expect(200)
 				.then(({ body: { comments } }) => {
-					expect(comments).to.be.sortedBy('created_at', { descending: true });
+					expect(comments).to.be.sortedBy('created_at', { ascending: true });
 				});
 		});
 		it('returns a status code 404 and an error message when passed an id which does not exist', () => {

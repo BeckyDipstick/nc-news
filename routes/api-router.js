@@ -12,5 +12,3 @@ apiRouter.use('/comments', commentsRouter);
 apiRouter.route('/').all(send405Error);
 
 module.exports = apiRouter;
-
-// /home/rebecca/Desktop/northcoders/backend/week-3/be-nc-news/endpoints.json

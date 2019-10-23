@@ -9,15 +9,6 @@ const connection = require('../db/connection');
 describe('/api', () => {
 	beforeEach(() => connection.seed.run());
 	after(() => connection.destroy());
-	// describe('GET/api', () => {
-	// 	it('returns a JSON object detailing all available end points and queries permitted on each route', () => {
-	// 		return request(app)
-	// 			.get('/api')
-	// 			.expect(200)
-	// 			.expect({ body })
-	// 			.to.be.an('object');
-	// 	});
-	// });
 	describe('DELETE/api', () => {
 		it('sends a status code 405 and an error message when in invalid method is used', () => {
 			return request(app)
@@ -39,14 +30,6 @@ describe('/api', () => {
 					);
 				});
 		});
-		// it('returns a 404 status code and an error message when an invalid route is given', () => {
-		// 	return request(app)
-		// 		.get('/corgi')
-		// 		.expect(404)
-		// 		.then(({ body }) => {
-		// 			expect(body.msg).to.equal('Route not found');
-		// 		});
-		// });
 	});
 	describe('/topics', () => {
 		it('GET / 200: returns an array of topic objects', () => {

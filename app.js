@@ -20,8 +20,5 @@ app.all('/*', (req, res, next) =>
 			'Coffee absolutely cannot under any circumstances be brewed here! I am a teapot!'
 	})
 );
-// app.all('/*', (req, res, next) =>
-// 	res.status(404).send({ msg: 'Route not found' })
-// );
 
 module.exports = app;

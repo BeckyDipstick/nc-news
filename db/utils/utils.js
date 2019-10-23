@@ -12,7 +12,6 @@ exports.makeRefObj = list => {
 		refObj[article.title] = article.article_id;
 	});
 	return refObj;
-	// article title key and the aricle id to be value
 };
 
 exports.formatComments = (comments, articleRef) => {
@@ -24,9 +23,6 @@ exports.formatComments = (comments, articleRef) => {
 		formattedComments.article_id = articleRef[comment.belongs_to];
 		delete formattedComments.belongs_to;
 		delete formattedComments.created_by;
-		// console.log(formattedComments);
 		return formattedComments;
 	});
-	// belongs_to key utilises the refObj
-	// formats the timestamp
 };

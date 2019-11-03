@@ -101,7 +101,8 @@ exports.selectAllArticles = ({
 		'title',
 		'votes',
 		'author',
-		'article_id'
+		'article_id',
+		'comment_count'
 	];
 	if (!validSortColumns.includes(sort_by)) sort_by = 'created_at';
 
